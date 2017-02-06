@@ -1,83 +1,66 @@
-﻿
+﻿using Assets.Scripts;
 using UnityEngine;
-using System.Collections;
 
 public class Playermovement : MonoBehaviour
-{
-    public float speed;             //Floating point variable to store the player's movement speed.
-    private Rigidbody2D rb2d;
-    //Store a reference to the Rigidbody2D component required to use 2D Physics.
-    // Use this for initialization
+{    
+    private Rigidbody2D player;
 
-    
+    public float speed;  
+
     void Start()
     {
         //Get and store a reference to the Rigidbody2D component so that we can access it.
-        rb2d = GetComponent<Rigidbody2D>();
+        player = GetComponent<Rigidbody2D>();
     }
+
 
     //FixedUpdate is called at a fixed interval and is independent of frame rate. Put physics code here.
     void FixedUpdate()
-    {
-
-
-
+    {        
         //Store the current horizontal input in the float moveHorizontal.
         float moveHorizontal = Input.GetAxis("Horizontal");
         float moveVertical = Input.GetAxis("Vertical");
-      
 
-     
-
-
-        if (Input.GetKeyDown(KeyCode.UpArrow))
-        {
-            transform.localEulerAngles = new Vector3(0, 0, 270);
-        }
-
-        if (Input.GetKeyDown(KeyCode.DownArrow))
-        {
-            transform.localEulerAngles = new Vector3(0, 0, 90);
-        }
-
-        if (Input.GetKeyDown(KeyCode.LeftArrow))
-        {
-            transform.localEulerAngles = new Vector3(0, 0, 0);
-        }
-
-        if (Input.GetKeyDown(KeyCode.RightArrow))
-        {
-            transform.localEulerAngles = new Vector3(0, 0, 180);
-        }
-
-
-
+        Vector3? playerRotation = null;
+        Vector2? playerDirection = null;
+        RigidbodyConstraints2D? playerBodyConstraints = null;
 
         if (Input.GetKey(KeyCode.UpArrow))
         {
-            rb2d.AddForce(Vector2.up * speed);
-            rb2d.constraints = RigidbodyConstraints2D.FreezePositionX;
+            playerRotation = new Vector3(0, 0, 270);
+            playerDirection = Vector2.up;
+            playerBodyConstraints = RigidbodyConstraints2D.FreezePositionX;
         }
 
         if (Input.GetKey(KeyCode.DownArrow))
         {
-            rb2d.AddForce(Vector2.down * speed);
-            rb2d.constraints = RigidbodyConstraints2D.FreezePositionX;
+            playerRotation = new Vector3(0, 0, 90);
+            playerDirection = Vector2.down;
+            playerBodyConstraints = RigidbodyConstraints2D.FreezePositionX;
         }
 
         if (Input.GetKey(KeyCode.LeftArrow))
         {
-            rb2d.AddForce(Vector2.left * speed);
-            rb2d.constraints = RigidbodyConstraints2D.FreezePositionY;
+            playerRotation = new Vector3(0, 0, 0);
+            playerDirection = Vector2.left;
+            playerBodyConstraints = RigidbodyConstraints2D.FreezePositionY;
         }
 
         if (Input.GetKey(KeyCode.RightArrow))
         {
-            rb2d.AddForce(Vector2.right * speed);
-            rb2d.constraints = RigidbodyConstraints2D.FreezePositionY;
+            playerRotation = new Vector3(0, 0, 180);
+            playerDirection = Vector2.right;
+            playerBodyConstraints = RigidbodyConstraints2D.FreezePositionY;
         }
 
+        if (playerRotation.HasValue)
+        {
+            player.transform.localEulerAngles = playerRotation.Value;
+            player.AddForce(playerDirection.Value * speed);
+            player.constraints = playerBodyConstraints.Value;
 
-        Debug.Log("hehhehe");
+            GameDataStore.Instance.CurrentPlayerDirection = playerDirection.Value;
+            GameDataStore.Instance.CurrentPlayerSpeed = speed;
+        }
     }
 }
